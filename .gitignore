@@ -2,4 +2,4 @@
 work/
 .nextflow/
 .nextflow.log*
-.dev_journal/
+dev_journal/
