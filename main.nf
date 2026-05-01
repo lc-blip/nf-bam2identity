@@ -1,22 +1,19 @@
 nextflow.enable.dsl=2
 
 // 1. Params
-params {
-    input: Path = ""
-}
+params.input = "data/*.bam"
 
 // 2. Process
-process bam2identity {
+process bam2identity_angsd {
     input:
     path bams
 
     output:
-    path "angsd_output*", emit: angsd_results
-    path "ngsRelate_output*", emit: relate_results
+    tuple path("angsd_output*"), path(bams), emit: angsd_results
 
     script:
     """
-    # Criar o filelist dinamicamente com os BAMs que o Nextflow injetou na pasta
+    # Creates the filelist 
     ls *.bam > all.filelist
 
     # ANGSD filters -> https://www.popgen.dk/angsd/index.php/Filters
@@ -35,8 +32,19 @@ process bam2identity {
             -only_proper_pairs 1 \\
             -uniqueOnly 1 \\
             -out angsd_output
+    """
 
+}
 
+process bam2identity_ngsRelate {
+    input:
+    tuple path(angsd_files), path(bams)
+
+    output:
+    path "ngsRelate_output*", emit: relate_results
+    
+    script:
+    """
     # Running ngsRelate
 
     # Extract allele frequency column for NGSrelate from .mafs.gz file
@@ -45,8 +53,8 @@ process bam2identity {
     echo "Extracting allele frequencies: "
     ls freqs
 
-    # Obtain number of samples in the glf.gz file
-    n_samples=\$(wc -l < all.filelist)
+    # Obtain number of samples 
+    n_samples=\$(ls *.bam | wc -l)
 
     echo "Obtaining number of samples in GL's file: "
     echo \$n_samples
@@ -62,11 +70,11 @@ process bam2identity {
 
     echo "Generated outputs: "
     ls ngsRelate_output*
-
-
     """
 
 }
+
+
 // 3. Workflow
 workflow {
     main:
@@ -74,12 +82,15 @@ workflow {
     // Preparare Bam processing channel
     bam_ch = channel.fromPath(params.input).collect()
 
-    // Run full script
-    bam2identity(bam_ch)
+    // Run angsd script
+    bam2identity_angsd(bam_ch)
+
+    // Run ngsRelate script
+    bam2identity_ngsRelate(bam2identity_angsd.out.angsd_results)
 
     publish:
-    results_angsd = bam2identity.out.angsd_results
-    results_relate = bam2identity.out.relate_results
+    results_angsd = bam2identity_angsd.out.angsd_results
+    results_relate = bam2identity_ngsRelate.out.relate_results
 
 }
 
