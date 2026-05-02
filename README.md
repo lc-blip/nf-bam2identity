@@ -17,5 +17,5 @@ To run this pipeline, you don't need to install complex bioinformatics tools loc
 
 **1. Clone the repository**
 ```bash
-git clone [https://github.com/lc-blip/nf-bam2identity.git](https://github.com/lc-blip/nf-bam2identity.git)
+git clone https://github.com/lc-blip/nf-bam2identity.git
 cd nf-bam2identity
