@@ -5,6 +5,7 @@ params.input = "data/*.bam"
 
 // 2. Process
 process bam2identity_angsd {
+    
     input:
     path bams
 
@@ -25,6 +26,10 @@ process bam2identity_angsd {
             -doGlf 3 \\
             -doMajorMinor 1 \\
             -doMaf 1 \\
+            -doIBS 1 \\
+            -doCounts 1 \\
+            -makeMatrix 1 \\
+            -SNP_pval 1e-6 \\
             -minMaf 0.05 \\
             -minMapQ 30 \\
             -minQ 20 \\
@@ -37,6 +42,7 @@ process bam2identity_angsd {
 }
 
 process bam2identity_ngsRelate {
+    
     input:
     tuple path(angsd_files), path(bams)
 
