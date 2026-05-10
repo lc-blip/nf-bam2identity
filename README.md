@@ -8,7 +8,7 @@ A mini-pipeline focused around using ANGSD and Nextflow to analyse Identity by S
 
 To run this pipeline, you don't need to install complex bioinformatics tools locally. You only need:
 
-* **[Docker](https://docs.docker.com/get-docker/):** To run the ANGSD software in an isolated, reproducible container.
+* **[Docker](https://docs.docker.com/get-docker/):** To run the ANGSD and ngsRelate software in an isolated, reproducible container.
 * **[Conda](https://docs.conda.io/en/latest/) (or Mamba):** To easily create the environment that runs Nextflow.
 
 ## Getting Started
