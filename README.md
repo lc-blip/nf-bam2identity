@@ -19,3 +19,33 @@ To run this pipeline, you don't need to install complex bioinformatics tools loc
 ```bash
 git clone https://github.com/lc-blip/nf-bam2identity.git
 cd nf-bam2identity
+```
+
+**2. Activate the conda environment**
+```bash
+conda env create -f environment.yaml -n nf_bam2identity
+conda activate nf_bam2identity
+```
+
+**3. Define paths and parameters inside params.yaml**
+
+Open the **params.yaml** file with your prefered text editor and follow the instructions found inside.
+
+**4. Run the nextflow script**
+
+Inside the **nf-bam2identity** folder run the following command:
+```bash
+nextflow run main.nf -params-file params.yaml
+```
+
+**5. Consult you results**
+
+The results will be found inside the folder **nf-bam2identity/results**.
+
+Additional logs can be found inside **nf-bam2identity/work**.
+
+
+
+
+
+
