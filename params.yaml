@@ -1,0 +1,84 @@
+##########################################################
+#                                                        #
+# Configure the parameters for angsd and ngsRelate here! #
+#                                                        # 
+##########################################################
+
+### 1. Input BAM files ###
+
+# Define the path to the BAM files. 
+# Example: "data/*.bam" (keep quotes around globs so the shell does not expand them).
+
+bam_dir: "bams/*.bam"
+
+
+### 2. ANGSD parameters ###
+
+# Define the parameters for ANGSD. Adjust these parameters based on your specific needs and data quality.
+
+angsd:
+  GL: 1
+  doGlf: 3
+  doMajorMinor: 1
+  doMaf: 1
+  doIBS: 1
+  doCounts: 1
+  makeMatrix: 1
+  SNP_pval: "1e-6"
+  minMaf: 0.05
+  minMapQ: 30
+  minQ: 20
+  remove_bads: 1
+  only_proper_pairs: 1
+  uniqueOnly: 1
+
+# Parameters information from ANGSD documentation:
+#   GL: genotype likelihood model (1=SAMtools, 2=GATK, 3=Beagle)
+#   doGlf: output genotype likelihoods (0=none, 1=beagle, 2=binary, 3=mafs.gz)      
+#   doMajorMinor: infer major and minor alleles (0=none, 1=major, 2=minor)
+#   doMaf: calculate allele frequencies (0=none, 1=major,
+#   doIBS: calculate identity-by-state (0=none, 1=matrix)
+#   doCounts: count reads (0=none, 1=counts)
+#   makeMatrix: make matrix for ngsRelate (0=none, 1=make)
+#   SNP_pval: p-value threshold for SNP calling
+#   minMaf: minimum minor allele frequency
+#   minMapQ: minimum mapping quality
+#   minQ: minimum base quality
+#   remove_bads: remove bad reads (0=no, 1=yes)
+#   only_proper_pairs: only use properly paired reads (0=no, 1=yes)
+#   uniqueOnly: only use uniquely mapped reads (0=no, 1=yes)
+
+
+### 3. ngsRelate parameters ###
+
+# Define the parameters for ngsRelate. Adjust these parameters based on your specific needs and data quality.
+# Do not put -g, -f, -n, or -O here; the pipeline sets those automatically.
+
+ngsRelate:
+  p: 4
+  # m: 1
+  # i: 1000
+  # t: 0.000001
+  # r: 12345
+  # F: 1
+  # o: 1
+  # v: 1
+  # a: 0
+  # b: 1
+  # B: 100
+  # N: 10
+  # l: 0
+
+# Parameters information from ngsRelate README:
+#   p: threads
+#   m: model, 0=normalEM, 1=acceleratedEM
+#   i: maximum number of EM iterations
+#   t: EM tolerance
+#   r: random seed
+#   F: estimate inbreeding only
+#   o: estimate 3 Jacquard coefficients assuming no inbreeding
+#   v: verbose output
+#   a/b: analyse a specific pair of individuals, zero-based indices
+#   B: bootstrap replicates for single-pair analysis
+#   N: number of random starts per pair
+#   l: minMaf or 1-Maf filter

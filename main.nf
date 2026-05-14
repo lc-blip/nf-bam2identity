@@ -1,7 +1,9 @@
 nextflow.enable.dsl=2
 
 // 1. Params
-params.input = "data/*.bam"
+params.bam_dir = ""
+params.angsd     = [:]
+params.ngsRelate = [:]
 
 // 2. Process
 process bam2identity_angsd {
@@ -13,6 +15,8 @@ process bam2identity_angsd {
     tuple path("angsd_output*"), path(bams), emit: angsd_results
 
     script:
+    def angsd_flags = params.angsd.collect { k, v -> "-${k} ${v}" }.join(" ")
+
     """
     # Creates the filelist 
     ls *.bam > all.filelist
@@ -21,28 +25,16 @@ process bam2identity_angsd {
 
     # Runing ANGSD to generate GL's.
 
-    angsd -b all.filelist \\
-            -GL 1 \\
-            -doGlf 3 \\
-            -doMajorMinor 1 \\
-            -doMaf 1 \\
-            -doIBS 1 \\
-            -doCounts 1 \\
-            -makeMatrix 1 \\
-            -SNP_pval 1e-6 \\
-            -minMaf 0.05 \\
-            -minMapQ 30 \\
-            -minQ 20 \\
-            -remove_bads 1 \\
-            -only_proper_pairs 1 \\
-            -uniqueOnly 1 \\
-            -out angsd_output
+    angsd -b all.filelist ${angsd_flags} -out angsd_output
+
     """
 
 }
 
 process bam2identity_ngsRelate {
-    
+
+    cpus { params.ngsRelate.p ?: 1 }
+
     input:
     tuple path(angsd_files), path(bams)
 
@@ -50,6 +42,9 @@ process bam2identity_ngsRelate {
     path "ngsRelate_output*", emit: relate_results
     
     script:
+
+    def relate_flags = params.ngsRelate.collect { k, v -> v != null ? "-${k} ${v}" : "" }.join(" ")
+
     """
     # Running ngsRelate
 
@@ -72,6 +67,7 @@ process bam2identity_ngsRelate {
     ngsRelate -g angsd_output.glf.gz \\
             -f freqs \\
             -n \$n_samples \\
+            ${relate_flags} \\
             -O ngsRelate_output
 
     echo "Generated outputs: "
@@ -86,7 +82,7 @@ workflow {
     main:
 
     // Preparare Bam processing channel
-    bam_ch = channel.fromPath(params.input).collect()
+    bam_ch = channel.fromPath(params.bam_dir).collect()
 
     // Run angsd script
     bam2identity_angsd(bam_ch)
