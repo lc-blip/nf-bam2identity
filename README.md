@@ -2,7 +2,7 @@
 
 **Work in Progress:** This repository is currently under active development.
 
-A mini-pipeline focused around using ANGSD and Nextflow to analyse Identity by State (IBS) and Identity by Descent (IBD) from BAM files.
+A mini-pipeline focused around using Nextflow, ANGSD and ngsRelate to analyse Identity by State (IBS) and Identity by Descent (IBD) from BAM files.
 
 ## Prerequisites
 
