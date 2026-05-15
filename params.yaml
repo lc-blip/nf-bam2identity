@@ -4,6 +4,16 @@
 #                                                        # 
 ##########################################################
 
+# ==============================================================================
+# PIPELINE OUTPUTS NOTE: 
+# These default settings produce BOTH IBS (Identity by State) matrices and 
+# IBD (Identity by Descent) results. 
+#
+# If you ONLY want IBD results (calculated by ngsRelate), you must comment out 
+# or remove the 'doIBS' and 'makeMatrix' parameters in the ANGSD section below.
+# ==============================================================================
+
+
 ### 1. Input BAM files ###
 
 # Define the path to the BAM files. 
@@ -14,71 +24,83 @@ bam_dir: "bams/*.bam"
 
 ### 2. ANGSD parameters ###
 
-# Define the parameters for ANGSD. Adjust these parameters based on your specific needs and data quality.
+# ==============================================================================
+# Define the parameters for ANGSD. Adjust based on your dataset's needs.
+# To activate a parameter, simply remove the '# ' at the beginning of the line.
+#
+# IMPORTANT: Parameters -b (bam filelist) and -out (output prefix) 
+# are intentionally omitted here as the Nextflow pipeline sets them automatically.
+# ==============================================================================
 
 angsd:
-  GL: 1
-  doGlf: 3
-  doMajorMinor: 1
-  doMaf: 1
-  doIBS: 1
-  doCounts: 1
-  makeMatrix: 1
-  SNP_pval: "1e-6"
-  minMaf: 0.05
-  minMapQ: 30
-  minQ: 20
-  remove_bads: 1
-  only_proper_pairs: 1
-  uniqueOnly: 1
+  # --- Performance ---
+  nThreads: 4           # [INT] Number of threads to use
 
-# Parameters information from ANGSD documentation:
-#   GL: genotype likelihood model (1=SAMtools, 2=GATK, 3=Beagle)
-#   doGlf: output genotype likelihoods (0=none, 1=beagle, 2=binary, 3=mafs.gz)      
-#   doMajorMinor: infer major and minor alleles (0=none, 1=major, 2=minor)
-#   doMaf: calculate allele frequencies (0=none, 1=major,
-#   doIBS: calculate identity-by-state (0=none, 1=matrix)
-#   doCounts: count reads (0=none, 1=counts)
-#   makeMatrix: make matrix for ngsRelate (0=none, 1=make)
-#   SNP_pval: p-value threshold for SNP calling
-#   minMaf: minimum minor allele frequency
-#   minMapQ: minimum mapping quality
-#   minQ: minimum base quality
-#   remove_bads: remove bad reads (0=no, 1=yes)
-#   only_proper_pairs: only use properly paired reads (0=no, 1=yes)
-#   uniqueOnly: only use uniquely mapped reads (0=no, 1=yes)
+  # --- Genotype Likelihoods ---
+  GL: 1                 # [INT] GL model: 1=SAMtools, 2=GATK, 3=Beagle
+  doGlf: 3              # [INT] Output format: 3=binary format (REQUIRED by ngsRelate)
+  
+  # --- Allele Frequencies & SNP Calling ---
+  doMajorMinor: 1       # [INT] Infer major/minor alleles: 1=from GL, 2=from counts
+  doMaf: 1              # [INT] Calculate allele frequencies: 1=known major/minor
+  doCounts: 1           # [INT] Count reads (required for doMaf)
+  SNP_pval: "1e-6"      # [FLOAT] p-value threshold for keeping a site as a SNP
+  minMaf: 0.05          # [FLOAT] Minimum minor allele frequency threshold
+  # minInd: 5           # [INT] Min. number of individuals with data to keep a site (adjust to your n)
+
+  # --- Read & Base Quality Filters (QC) ---
+  minMapQ: 30           # [INT] Minimum mapping quality (removes poorly aligned reads)
+  minQ: 20              # [INT] Minimum base quality (removes bad sequencing calls)
+  remove_bads: 1        # [INT] Remove reads flagged as bad (0=no, 1=yes)
+  uniqueOnly: 1         # [INT] Use only uniquely mapped reads (0=no, 1=yes)
+  only_proper_pairs: 1  # [INT] Use only properly paired reads (0=no, 1=yes)
+  # baq: 1              # [INT] Compute Base Alignment Quality (1=normal, 2=extended)
+  # C: 50               # [INT] Adjust mapQ for excessive mismatches (recommended 50 for BWA BAMs)
+  
+  # --- Core Identity Metrics (IBS) ---
+  doIBS: 1              # [INT] Calculate Identity-by-State (IBS) 
+  makeMatrix: 1         # [INT] Make pairwise IBS distance matrix (.ibsMat)
 
 
 ### 3. ngsRelate parameters ###
 
-# Define the parameters for ngsRelate. Adjust these parameters based on your specific needs and data quality.
-# Do not put -g, -f, -n, or -O here; the pipeline sets those automatically.
+# ==============================================================================
+# Define the parameters for ngsRelate. Adjust based on your dataset's needs.
+# To activate a parameter, simply remove the '# ' at the beginning of the line.
+#
+# IMPORTANT: Parameters -g (input), -f (freqs), -n (samples), and -O (output) 
+# are intentionally omitted here as the Nextflow pipeline sets them automatically.
+# ==============================================================================
 
 ngsRelate:
-  p: 4
-  # m: 1
-  # i: 1000
-  # t: 0.000001
-  # r: 12345
-  # F: 1
-  # o: 1
-  # v: 1
-  # a: 0
-  # b: 1
-  # B: 100
-  # N: 10
-  # l: 0
+  # --- Core Execution & Performance ---
+  p: 4                  # [INT] Threads to use (default: 4)
+  # m: 1                # [INT] Model to use: 0=normalEM, 1=acceleratedEM
+  # i: 1000             # [INT] Maximum number of EM iterations
+  # t: 0.000001         # [FLOAT] Tolerance for breaking EM
+  # r: 12345            # [FLOAT] Seed for random number generator
+  # v: 1                # [INT] Verbose output (prints info per iteration)
 
-# Parameters information from ngsRelate README:
-#   p: threads
-#   m: model, 0=normalEM, 1=acceleratedEM
-#   i: maximum number of EM iterations
-#   t: EM tolerance
-#   r: random seed
-#   F: estimate inbreeding only
-#   o: estimate 3 Jacquard coefficients assuming no inbreeding
-#   v: verbose output
-#   a/b: analyse a specific pair of individuals, zero-based indices
-#   B: bootstrap replicates for single-pair analysis
-#   N: number of random starts per pair
-#   l: minMaf or 1-Maf filter
+  # --- Analysis Modes ---
+  # F: 1                # [INT] Estimate ONLY inbreeding instead of the 9 Jacquard coefficients
+  # o: 1                # [INT] Estimate the 3 Jacquard coefficients assuming NO inbreeding
+  # c: 1                # [INT] Call genotypes instead of using likelihoods
+  # e: 0.01             # [FLOAT] Error rates when calling genotypes (used with -c)
+  
+  # --- Single-Pair Analysis (Targeting specific individuals) ---
+  # a: 0                # [INT] Index of the 1st individual for analysis (zero-based offset)
+  # b: 1                # [INT] Index of the 2nd individual for analysis (zero-based offset)
+  # B: 100              # [INT] Number of bootstrap replicates (ONLY works for single pairs)
+  # N: 10               # [INT] Number of times to start each pair with a random seed
+
+  # --- Data Filtering & Adjustments ---
+  # l: 0.05             # [FLOAT] minMaf or 1-Maf filter
+  # s: 1                # [INT] Switch the frequency with 1-freq
+  # z: "ids.txt"        # [STRING] Name of a file with sample IDs (optional)
+  # L: 10000            # [INT] Number of genomic sites (pipeline provides -f, so this is usually not needed)
+
+  # --- Format Specific Parameters ---
+  # R: "chr1:1-100"     # [STRING] Region for analysis (only applicable for BCF inputs)
+  # T: "PL"             # [STRING] For VCF use PL (default) or GT tag
+  # A: "AFngsrelate"    # [STRING] For VCF use allele frequency TAG
+  # P: "my_plink"       # [STRING] Name of the binary plink file (excluding the .bed)
