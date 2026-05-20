@@ -52,7 +52,7 @@ process bam2identity_ngsRelate {
     """
     # Running ngsRelate
 
-    # Extract allele frequency column for ngsRelate from .mafs.gz file
+    # Extract knownEM, the allele frequency column required by ngsRelate.
     zcat angsd_output.mafs.gz | cut -f5 | sed 1d > freqs
 
     echo "Extracting allele frequencies: "

@@ -5,4 +5,4 @@ channels:
   - bioconda
 
 dependencies:
-  - nextflow
+  - nextflow=26
