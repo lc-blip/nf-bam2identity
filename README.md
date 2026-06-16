@@ -76,11 +76,19 @@ nf-bam2identity/
 
 ### 5. Run the Nextflow script
 
-Inside the `nf-bam2identity` folder, run:
+Inside the `nf-bam2identity` folder, run the local Docker profile with:
 
 ```bash
 nextflow run main.nf -params-file params.yaml
 ```
+
+To run on an HPC cluster with SLURM, use the SLURM profile instead:
+
+```bash
+nextflow run main.nf -profile slurm -params-file params.yaml -resume
+```
+
+Before using SLURM, edit `configs/slurm.config` to match your cluster. See `docs/slurm.md` for details.
 
 ### 6. Consult your results
 
@@ -97,20 +105,6 @@ Intermediate Nextflow files and logs can be found in:
 
 ```text
 work/
-```
-
-### 7. Run on SLURM
-
-Edit `configs/slurm.config` to match the target cluster, then run:
-
-```bash
-nextflow run main.nf -profile slurm -params-file params.yaml -resume
-```
-
-You can inspect the resolved configuration without submitting jobs:
-
-```bash
-nextflow config -profile slurm
 ```
 
 ## Parameters

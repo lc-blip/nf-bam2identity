@@ -37,6 +37,8 @@ nextflow run main.nf \
 
 ## SLURM execution
 
+Before using SLURM, edit `configs/slurm.config` to match the cluster where the workflow will run.
+
 Run the workflow with the generic SLURM profile:
 
 ```bash
@@ -48,3 +50,5 @@ Preview the resolved configuration without submitting jobs:
 ```bash
 nextflow config -profile slurm
 ```
+
+For the available SLURM settings, see `docs/slurm.md`.

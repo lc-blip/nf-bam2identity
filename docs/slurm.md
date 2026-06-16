@@ -93,12 +93,16 @@ Do not set `nThreads` under `angsd` or `p` under `ngsRelate` in `params.yaml`.
 
 ## Software modules
 
-The default SLURM profile assumes ANGSD and ngsRelate are available as environment modules:
+The default SLURM profile assumes ANGSD and ngsRelate are available as environment modules.
+
+The module names below are examples:
 
 ```groovy
 params.slurm_angsd_module = 'angsd/0.940'
 params.slurm_ngsrelate_module = 'ngsrelate/2.0'
 ```
+
+Replace them with the actual module names available on the cluster where you are running the workflow.
 
 Module names vary between clusters. Check the available modules on your HPC system, for example:
 
@@ -171,7 +175,7 @@ module = params.slurm_angsd_module
 
 This keeps local execution and HPC execution separate.
 
-If your cluster uses Apptainer or Singularity instead of modules, the SLURM profile would need to be adapted.
+The current SLURM profile does not configure Apptainer or Singularity. It is intentionally kept module-based for now.
 
 ## Logs
 
