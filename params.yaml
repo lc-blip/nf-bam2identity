@@ -29,8 +29,8 @@ bam_dir: "bams/*.bam"
 #
 # Leave this block commented for normal use.
 #
-# Uncomment and edit it only if you are running locally and want to change the
-# default CPU, memory, or time settings.
+# Uncomment and edit it only if you are running locally and want to set explicit
+# CPU, memory, or time settings.
 #
 # Do NOT uncomment this block for SLURM runs. If you run with:
 #
@@ -50,18 +50,18 @@ bam_dir: "bams/*.bam"
 # local_process_resources:
 #   default:
 #     cpus: 1
-#     memory: "4 GB"
-#     time: "02:00:00"
+#     # memory: "4 GB"
+#     # time: "02:00:00"
 #
 #   angsd_step:
 #     cpus: 4
-#     memory: "8 GB"
-#     time: "06:00:00"
+#     # memory: "8 GB"
+#     # time: "06:00:00"
 #
 #   ngsrelate_step:
 #     cpus: 4
-#     memory: "4 GB"
-#     time: "04:00:00"
+#     # memory: "4 GB"
+#     # time: "04:00:00"
 
 
 ### 3. ANGSD parameters ###

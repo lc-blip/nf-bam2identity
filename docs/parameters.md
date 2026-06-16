@@ -146,26 +146,26 @@ Most users can leave the `ngsRelate` block unchanged at first.
 
 ## Optional local resources
 
-Local execution uses default resources from `nextflow.config`. Most users can leave them unchanged.
+Local execution uses one CPU per process by default and does not set memory or time limits. This keeps local runs portable across laptops and workstations with different amounts of RAM.
 
-If you are running locally and want to change CPU, memory, or time settings, uncomment the optional `local_process_resources` block in `params.yaml`:
+If you are running locally and want to change CPU settings, or add explicit memory or time limits, uncomment the optional `local_process_resources` block in `params.yaml`:
 
 ```yaml
 # local_process_resources:
 #   default:
 #     cpus: 1
-#     memory: "4 GB"
-#     time: "02:00:00"
+#     # memory: "4 GB"
+#     # time: "02:00:00"
 #
 #   angsd_step:
 #     cpus: 4
-#     memory: "8 GB"
-#     time: "06:00:00"
+#     # memory: "8 GB"
+#     # time: "06:00:00"
 #
 #   ngsrelate_step:
 #     cpus: 4
-#     memory: "4 GB"
-#     time: "04:00:00"
+#     # memory: "4 GB"
+#     # time: "04:00:00"
 ```
 
 The commands use `task.cpus` internally, so the number of tool threads always matches the CPUs requested by Nextflow.

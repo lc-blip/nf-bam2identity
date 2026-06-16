@@ -171,19 +171,26 @@ Controls pairwise relatedness estimation and ngsRelate runtime options.
 
 Threads are not configured as ANGSD or ngsRelate parameters. The workflow sets ANGSD `-nThreads` and ngsRelate `-p` from the CPUs assigned to each Nextflow process.
 
-For normal local use, leave the optional `local_process_resources` block in `params.yaml` commented. To override local CPU, memory, or time settings, uncomment and edit that block:
+For normal local use, leave the optional `local_process_resources` block in `params.yaml` commented. Local runs use one CPU per process by default and do not set memory or time limits unless you explicitly configure them.
+
+To override local CPU settings, or to add explicit local memory/time limits, uncomment and edit that block:
 
 ```yaml
 # local_process_resources:
+#   default:
+#     cpus: 1
+#     # memory: "4 GB"
+#     # time: "02:00:00"
+#
 #   angsd_step:
 #     cpus: 4
-#     memory: "8 GB"
-#     time: "06:00:00"
+#     # memory: "8 GB"
+#     # time: "06:00:00"
 #
 #   ngsrelate_step:
 #     cpus: 4
-#     memory: "4 GB"
-#     time: "04:00:00"
+#     # memory: "4 GB"
+#     # time: "04:00:00"
 ```
 
 For SLURM runs, keep `local_process_resources` commented and edit `configs/slurm.config` instead:
