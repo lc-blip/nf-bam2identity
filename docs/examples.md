@@ -8,6 +8,8 @@ Create the default input folder and place your BAM files there:
 mkdir -p bams
 ```
 
+Add at least two `.bam` files to this folder before running the workflow.
+
 ```bash
 nextflow run main.nf -params-file params.yaml
 ```

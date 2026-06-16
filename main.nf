@@ -26,7 +26,14 @@ process bam2identity_angsd {
     ls *.bam > all.filelist
 
     # Stores the number of BAM files/samples for ngsRelate
-    wc -l < all.filelist > n_samples.txt
+    n_bams=\$(wc -l < all.filelist)
+
+    if [ "\$n_bams" -lt 2 ]; then
+        echo "ERROR: At least two BAM files are required for pairwise relatedness analysis." >&2
+        exit 1
+    fi
+
+    echo "\$n_bams" > n_samples.txt
 
     # Running ANGSD to generate GL's.
 
@@ -86,7 +93,9 @@ workflow {
     main:
 
     // Prepare BAM input channel
-    bam_ch = channel.fromPath(params.bam_dir).collect()
+    bam_ch = Channel
+        .fromPath(params.bam_dir, checkIfExists: true)
+        .collect()
 
     // Run angsd script
     bam2identity_angsd(bam_ch)

@@ -32,6 +32,8 @@ The `bams/` folder is not created by Nextflow. Create it yourself or replace `ba
 
 The current workflow collects only `.bam` files. `.bai` files may be present in the same folder, but they are not explicitly staged or managed by the pipeline.
 
+At least two BAM files are required for pairwise relatedness analysis. If `bam_dir` does not match any files, Nextflow stops before running ANGSD. If only one BAM is provided, the ANGSD process stops with a clear error message.
+
 Do not set ANGSD `nThreads` or ngsRelate `p` in `params.yaml`. The workflow sets these automatically from the CPUs assigned to each Nextflow process.
 
 ## Optional local resources

@@ -59,6 +59,8 @@ bam_dir: "/path/to/my/bams/*.bam"
 
 At the moment, the workflow collects only `.bam` files. BAM index files such as `.bai` can stay next to your BAMs, but they are not explicitly staged or managed by the pipeline.
 
+At least two BAM files are required, because the workflow estimates pairwise relatedness. If the path in `bam_dir` does not match any BAM files, Nextflow will stop before running ANGSD.
+
 Using the default configuration, the expected directory structure is:
 
 ```text
@@ -128,6 +130,8 @@ bam_dir: "bams/*.bam"
 The `bams/` folder is not created automatically. Either create it yourself or change `bam_dir` to match the folder where your BAM files are already stored.
 
 Only `.bam` files are collected by the current workflow. `.bai` files are ignored unless support for indexed BAM inputs is added in a future version.
+
+The workflow requires at least two BAM files. If `bam_dir` points to an empty folder or a path with no matching BAM files, the run stops early with an input error.
 
 ### ANGSD parameters
 

@@ -16,6 +16,8 @@ bam_dir: "bams/*.bam"
 
 Create that folder yourself, or edit `bam_dir` to point to the folder where your BAM files are stored.
 
+The workflow requires at least two BAM files. If the path does not match any BAM files, the run stops before ANGSD starts.
+
 Resume a previous run:
 
 ```bash
