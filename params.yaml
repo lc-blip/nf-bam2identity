@@ -22,7 +22,49 @@
 bam_dir: "bams/*.bam"
 
 
-### 2. ANGSD parameters ###
+### 2. Optional local compute resources ###
+
+# ==============================================================================
+# These settings are OPTIONAL and are only meant for local runs.
+#
+# Leave this block commented for normal use.
+#
+# Uncomment and edit it only if you are running locally and want to change the
+# default CPU, memory, or time settings.
+#
+# Do NOT uncomment this block for SLURM runs. If you run with:
+#
+#   nextflow run main.nf -profile slurm -params-file params.yaml
+#
+# define CPU, memory, time, queue, modules, and other HPC settings in:
+#
+#   configs/slurm.config
+#
+# This avoids defining compute resources in two different places.
+#
+# Note: ANGSD -nThreads and ngsRelate -p are set automatically from the CPUs
+# assigned to each Nextflow process. Do not add nThreads under `angsd` or p under
+# `ngsRelate`.
+# ==============================================================================
+
+# local_process_resources:
+#   default:
+#     cpus: 1
+#     memory: "4 GB"
+#     time: "02:00:00"
+#
+#   angsd_step:
+#     cpus: 4
+#     memory: "8 GB"
+#     time: "06:00:00"
+#
+#   ngsrelate_step:
+#     cpus: 4
+#     memory: "4 GB"
+#     time: "04:00:00"
+
+
+### 3. ANGSD parameters ###
 
 # ==============================================================================
 # Define the parameters for ANGSD. Adjust based on your dataset's needs.
@@ -33,9 +75,6 @@ bam_dir: "bams/*.bam"
 # ==============================================================================
 
 angsd:
-  # --- Performance ---
-  nThreads: 4           # [INT] Number of threads to use
-
   # --- Genotype Likelihoods ---
   GL: 1                 # [INT] GL model: 1=SAMtools, 2=GATK, 3=Beagle
   doGlf: 3              # [INT] Output format: 3=binary format (REQUIRED by ngsRelate)
@@ -62,7 +101,7 @@ angsd:
   makeMatrix: 1         # [INT] Make pairwise IBS distance matrix (.ibsMat)
 
 
-### 3. ngsRelate parameters ###
+### 4. ngsRelate parameters ###
 
 # ==============================================================================
 # Define the parameters for ngsRelate. Adjust based on your dataset's needs.
@@ -73,8 +112,7 @@ angsd:
 # ==============================================================================
 
 ngsRelate:
-  # --- Core Execution & Performance ---
-  p: 4                  # [INT] Threads to use (default: 4)
+  # --- Core Execution ---
   # m: 1                # [INT] Model to use: 0=normalEM, 1=acceleratedEM
   # i: 1000             # [INT] Maximum number of EM iterations
   # t: 0.000001         # [FLOAT] Tolerance for breaking EM

@@ -7,8 +7,6 @@ params.ngsRelate = [:]
 
 // 2. Process
 process bam2identity_angsd {
-
-    cpus { params.angsd.nThreads ?: 1 }
     
     input:
     path bams
@@ -18,7 +16,10 @@ process bam2identity_angsd {
     tuple path("angsd_output*"), path("n_samples.txt"), emit: angsd_for_ngsRelate
 
     script:
-    def angsd_flags = params.angsd.collect { k, v -> "-${k} ${v}" }.join(" ")
+    def angsd_flags = params.angsd
+        .findAll { k, v -> k != 'nThreads' && v != null }
+        .collect { k, v -> "-${k} ${v}" }
+        .join(" ")
 
     """
     # Creates the filelist 
@@ -29,15 +30,13 @@ process bam2identity_angsd {
 
     # Running ANGSD to generate GL's.
 
-    angsd -b all.filelist ${angsd_flags} -out angsd_output
+    angsd -b all.filelist ${angsd_flags} -nThreads ${task.cpus} -out angsd_output
 
     """
 
 }
 
 process bam2identity_ngsRelate {
-
-    cpus { params.ngsRelate.p ?: 1 }
 
     input:
     tuple path(angsd_files), path(n_samples_file)
@@ -47,7 +46,10 @@ process bam2identity_ngsRelate {
     
     script:
 
-    def relate_flags = params.ngsRelate.collect { k, v -> v != null ? "-${k} ${v}" : "" }.join(" ")
+    def relate_flags = params.ngsRelate
+        .findAll { k, v -> k != 'p' && v != null }
+        .collect { k, v -> "-${k} ${v}" }
+        .join(" ")
 
     """
     # Running ngsRelate
@@ -69,6 +71,7 @@ process bam2identity_ngsRelate {
     ngsRelate -g angsd_output.glf.gz \\
             -f freqs \\
             -n \$n_samples \\
+            -p ${task.cpus} \\
             ${relate_flags} \\
             -O ngsRelate_output
 
@@ -82,7 +85,7 @@ process bam2identity_ngsRelate {
 workflow {
     main:
 
-    // Preparar BAM processing channel
+    // Prepare BAM input channel
     bam_ch = channel.fromPath(params.bam_dir).collect()
 
     // Run angsd script

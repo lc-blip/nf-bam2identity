@@ -3,3 +3,7 @@ work/
 .nextflow/
 .nextflow.log*
 dev_journal/
+results/
+bams/
+*.bam
+*.bai

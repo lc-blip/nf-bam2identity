@@ -11,6 +11,8 @@ To run this pipeline, you don't need to install complex bioinformatics tools loc
 * **[Docker](https://docs.docker.com/get-docker/):** To run ANGSD and ngsRelate in isolated, reproducible containers.
 * **[Conda](https://docs.conda.io/en/latest/) (or Mamba):** To create the environment that runs Nextflow.
 
+For HPC execution, the repository includes a generic SLURM profile in `configs/slurm.config`.
+
 ## Getting Started
 
 ### 1. Clone the repository
@@ -31,9 +33,9 @@ conda activate nf_bam2identity
 
 Open the `params.yaml` file with your preferred text editor and follow the instructions inside.
 
-This file controls the input BAM path, ANGSD parameters, and ngsRelate parameters.
+This file controls the input BAM path, ANGSD parameters, and ngsRelate parameters. It also includes an optional commented block for local compute resources.
 
-By default, the pipeline expects BAM files inside the `bams/` folder:
+By default, the example configuration expects BAM files inside a folder called `bams/`:
 
 ```yaml
 bam_dir: "bams/*.bam"
@@ -41,7 +43,21 @@ bam_dir: "bams/*.bam"
 
 ### 4. Prepare your input BAM files
 
-Make sure your BAM files are in the directory defined by `bam_dir` in `params.yaml`.
+Make sure `bam_dir` in `params.yaml` points to the folder where your BAM files are stored.
+
+If you want to use the default path, create a `bams/` folder and place your BAM files there:
+
+```bash
+mkdir -p bams
+```
+
+You can also point `bam_dir` to another location:
+
+```yaml
+bam_dir: "/path/to/my/bams/*.bam"
+```
+
+At the moment, the workflow collects only `.bam` files. BAM index files such as `.bai` can stay next to your BAMs, but they are not explicitly staged or managed by the pipeline.
 
 Using the default configuration, the expected directory structure is:
 
@@ -69,9 +85,10 @@ nextflow run main.nf -params-file params.yaml
 Results will be written to:
 
 ```text
-final_output/
-├── angsd/
-└── ngsRelate/
+results/
+└── final_output/
+    ├── angsd/
+    └── ngsRelate/
 ```
 
 Intermediate Nextflow files and logs can be found in:
@@ -80,11 +97,25 @@ Intermediate Nextflow files and logs can be found in:
 work/
 ```
 
+### 7. Run on SLURM
+
+Edit `configs/slurm.config` to match the target cluster, then run:
+
+```bash
+nextflow run main.nf -profile slurm -params-file params.yaml -resume
+```
+
+You can inspect the resolved configuration without submitting jobs:
+
+```bash
+nextflow config -profile slurm
+```
+
 ## Parameters
 
 Pipeline parameters are defined in `params.yaml`.
 
-The file is divided into three main sections:
+The file is divided into four main sections:
 
 ### Input BAM files
 
@@ -94,6 +125,10 @@ Defines the path to the BAM files that will be analysed.
 bam_dir: "bams/*.bam"
 ```
 
+The `bams/` folder is not created automatically. Either create it yourself or change `bam_dir` to match the folder where your BAM files are already stored.
+
+Only `.bam` files are collected by the current workflow. `.bai` files are ignored unless support for indexed BAM inputs is added in a future version.
+
 ### ANGSD parameters
 
 Controls genotype likelihood estimation, allele frequency estimation, SNP filtering, read and base quality filtering, and IBS matrix generation.
@@ -102,7 +137,6 @@ Some important default parameters include:
 
 ```yaml
 angsd:
-  nThreads: 4
   GL: 1
   doGlf: 3
   doMajorMinor: 1
@@ -129,14 +163,49 @@ makeMatrix: 1
 
 Controls pairwise relatedness estimation and ngsRelate runtime options.
 
-The default configuration uses:
+Threads are not configured as ANGSD or ngsRelate parameters. The workflow sets ANGSD `-nThreads` and ngsRelate `-p` from the CPUs assigned to each Nextflow process.
+
+For normal local use, leave the optional `local_process_resources` block in `params.yaml` commented. To override local CPU, memory, or time settings, uncomment and edit that block:
 
 ```yaml
-ngsRelate:
-  p: 4 # Number of threads used by ngsRelate
+# local_process_resources:
+#   angsd_step:
+#     cpus: 4
+#     memory: "8 GB"
+#     time: "06:00:00"
+#
+#   ngsrelate_step:
+#     cpus: 4
+#     memory: "4 GB"
+#     time: "04:00:00"
 ```
 
+For SLURM runs, keep `local_process_resources` commented and edit `configs/slurm.config` instead:
+
+```groovy
+params.slurm_angsd_cpus = 4
+params.slurm_angsd_memory = '16 GB'
+params.slurm_angsd_time = '06:00:00'
+
+params.slurm_ngsrelate_cpus = 4
+params.slurm_ngsrelate_memory = '8 GB'
+params.slurm_ngsrelate_time = '04:00:00'
+```
+
+This avoids defining CPU, memory, or time in two different places.
+
+Advanced execution details are defined in `nextflow.config` for local runs and in `configs/slurm.config` for SLURM runs.
+
 For most use cases, edit `params.yaml` directly rather than changing `main.nf`.
+
+## Documentation
+
+Additional documentation is available in:
+
+* `docs/usage.md`
+* `docs/parameters.md`
+* `docs/slurm.md`
+* `docs/examples.md`
 
 ## Citation
 
