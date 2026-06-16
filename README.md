@@ -13,6 +13,8 @@ To run this pipeline, you don't need to install complex bioinformatics tools loc
 
 For HPC execution, the repository includes a generic SLURM profile in `configs/slurm.config`.
 
+For a more detailed description of how the workflow is organised, see `docs/workflow.md`.
+
 ## Getting Started
 
 ### 1. Clone the repository
@@ -34,6 +36,8 @@ conda activate nf_bam2identity
 Open the `params.yaml` file with your preferred text editor and follow the instructions inside.
 
 This file controls the input BAM path, ANGSD parameters, and ngsRelate parameters. It also includes an optional commented block for local compute resources.
+
+For a more detailed explanation of each parameter section, see `docs/parameters.md`.
 
 By default, the example configuration expects BAM files inside a folder called `bams/`:
 
@@ -90,6 +94,8 @@ nextflow run main.nf -profile slurm -params-file params.yaml -resume
 
 Before using SLURM, edit `configs/slurm.config` to match your cluster. See `docs/slurm.md` for details.
 
+For more execution examples and optional Nextflow report commands, see `docs/usage.md` and `docs/examples.md`.
+
 ### 6. Consult your results
 
 Results will be written to:
@@ -110,6 +116,8 @@ work/
 ## Parameters
 
 Pipeline parameters are defined in `params.yaml`.
+
+For a more complete parameter guide, see `docs/parameters.md`.
 
 The file is divided into four main sections:
 
@@ -200,6 +208,7 @@ For most use cases, edit `params.yaml` directly rather than changing `main.nf`.
 
 Additional documentation is available in:
 
+* `docs/workflow.md`
 * `docs/usage.md`
 * `docs/parameters.md`
 * `docs/slurm.md`
